@@ -8,12 +8,8 @@ namespace WeaponsReport
     {
         static void Main()
         {
-            int soldierQuantity = 10;
-            List<Soldier> soldiers = new List<Soldier>();
-            SoldierFabrik soldierFabrik = new SoldierFabrik();
-
-            for (int i = 0; i < soldierQuantity; i++)
-                soldiers.Add(soldierFabrik.CreateSoldier());
+            SoldierFactory soldierFactory = new SoldierFactory();
+            List<Soldier> soldiers = soldierFactory.Create();
 
             var soldiersInfo = soldiers.Select(soldier => new { soldier.Name, soldier.Rank });
 
@@ -24,21 +20,21 @@ namespace WeaponsReport
 
     class Soldier
     {
-        public Soldier(string name, string weapon, string rank, int productionYear)
+        public Soldier(string name, string weapon, string rank, int militaryServiceMonths)
         {
             Name = name;
             Weapon = weapon;
             Rank = rank;
-            MilitaryServiceMonths = productionYear;
+            MilitaryServiceMonths = militaryServiceMonths;
         }
 
-        public string Name { get; private set; }
-        public string Weapon { get; private set; }
-        public string Rank { get; private set; }
-        public int MilitaryServiceMonths { get; private set; }
+        public string Name { get; }
+        private string Weapon { get; }
+        public string Rank { get; }
+        private int MilitaryServiceMonths { get; }
     }
 
-    class SoldierFabrik
+    class SoldierFactory
     {
         private List<string> _names;
         private List<string> _weapons;
@@ -47,21 +43,29 @@ namespace WeaponsReport
 
         Random _random = new Random();
 
-        public SoldierFabrik()
+        public SoldierFactory()
         {
             FillNames();
             FillWeapons();
             FillRanks();
         }
 
-        public Soldier CreateSoldier()
+        public List<Soldier> Create()
         {
-            string name = _names[_random.Next(_names.Count)];
-            string weapon = _weapons[_random.Next(_weapons.Count)];
-            string rank = _ranks[_random.Next(_ranks.Count)];
-            int militaryServiceMonths = _random.Next(_militaryServiceStatsMonths[0], _militaryServiceStatsMonths[1]);
+            List<Soldier> soldiers = new List<Soldier>();
+            int soldiersQuantity = 10;
 
-            return new Soldier(name, weapon, rank, militaryServiceMonths);
+            for (int i = 0; i < soldiersQuantity; i++)
+            {
+                string name = _names[_random.Next(_names.Count)];
+                string weapon = _weapons[_random.Next(_weapons.Count)];
+                string rank = _ranks[_random.Next(_ranks.Count)];
+                int militaryServiceMonths = _random.Next(_militaryServiceStatsMonths[0], _militaryServiceStatsMonths[1]);
+
+                soldiers.Add(new Soldier(name, weapon, rank, militaryServiceMonths));
+            }
+
+            return soldiers;
         }
 
         private void FillNames() =>
